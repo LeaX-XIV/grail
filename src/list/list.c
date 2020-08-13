@@ -1,22 +1,29 @@
 #include <stdlib.h>
-#include "list.h"
+#include "list_p.h"
 
-int list_realloc(list_t* list, size_t new_size);
+list_t* list_create() {
+	list_t* list = malloc(sizeof(list_pt));
+
+	return list;
+}
 
 int list_init(list_t* list, size_t initial_size) {
-	unsigned int placeholder_arr;
-	
+	unsigned int* placeholder_arr;
+	list_pt* list_p;
+
 	if(list != NULL) {
-		placeholder_arr = malloc(initial_size * (sizeof list->arr));
+		list_p = (list_pt*) list;
+
+		placeholder_arr = malloc(initial_size * (sizeof *(list_p->arr)));
 		if(placeholder_arr == NULL) {
-			list->arr = NULL;
-			list->size = 0;
-			list->head = 0;
+			list_p->arr = NULL;
+			list_p->size = 0;
+			list_p->head = 0;
 			return 0;
 		}
-		list->arr = placeholder_arr;
-		list->size = initial_size;
-		list->head = 0;
+		list_p->arr = placeholder_arr;
+		list_p->size = initial_size;
+		list_p->head = 0;
 
 		return 1;
 	}
@@ -25,15 +32,17 @@ int list_init(list_t* list, size_t initial_size) {
 }
 
 int list_append(list_t* list, unsigned int value) {
-	if(list != NULL && list->arr != NULL) {
-		if(list->size == list->head) { // Array is full, need reallocation O(n)
-			if(list_realloc(list, list->size * 2) == 0) {
+	list_pt* list_p = (list_pt*) list;
+
+	if(list_p != NULL && list_p->arr != NULL) {
+		if(list_p->size == list_p->head) { // Array is full, need reallocation O(n)
+			if(list_realloc(list_p, list_p->size * 2) == 0) {
 				return 0;
 			}
 		}
 
-		list->arr[list->head] = value;
-		(list->head)++;
+		list_p->arr[list_p->head] = value;
+		(list_p->head)++;
 		return 1;
 	}
 
@@ -42,21 +51,22 @@ int list_append(list_t* list, unsigned int value) {
 
 int list_insert(list_t* list, unsigned int value, size_t pos) {
 	int i;
+	list_pt* list_p = (list_pt*) list;
 
-	if(list != NULL && list->arr != NULL) {
-		if(pos > list->head) return 0;
+	if(list_p != NULL && list_p->arr != NULL) {
+		if(pos > list_p->head) return 0;
 
-		if(list->size == list->head) { // Array is full, need reallocation O(n)
-			if(list_realloc(list, list->size * 2) == 0) {
+		if(list_p->size == list_p->head) { // Array is full, need reallocation O(n)
+			if(list_realloc(list_p, list_p->size * 2) == 0) {
 				return 0;
 			}
 		}
 
-		for(i = list->head; i > pos; --i) {
-			list->arr[i] = list->arr[i-1];
+		for(i = list_p->head; i > pos; --i) {
+			list_p->arr[i] = list_p->arr[i-1];
 		}
-		list->arr[pos] = value;
-		++(list->head);
+		list_p->arr[pos] = value;
+		++(list_p->head);
 
 		return 1;
 	}
@@ -65,11 +75,13 @@ int list_insert(list_t* list, unsigned int value, size_t pos) {
 }
 
 int list_get(list_t* list, size_t index, unsigned int* value) {
-	if(list != NULL && list->arr != NULL) {
-		if(value == NULL) return 0;
-		if(index > list->head) return 0;
+	list_pt* list_p = (list_pt*) list;
 
-		*value = list->arr[index];
+	if(list_p != NULL && list_p->arr != NULL) {
+		if(value == NULL) return 0;
+		if(index > list_p->head) return 0;
+
+		*value = list_p->arr[index];
 
 		return 1;
 	}
@@ -77,11 +89,13 @@ int list_get(list_t* list, size_t index, unsigned int* value) {
 	return 0;
 }
 
-int list_get_last(list_t* list, unsigned int value) {
-	if(list != NULL && list->arr != NULL) {
+int list_get_last(list_t* list, unsigned int* value) {
+	list_pt* list_p = (list_pt*) list;
+
+	if(list_p != NULL && list_p->arr != NULL) {
 		if(value == NULL) return 0;
 
-		*value = list->arr[list->head - 1];
+		*value = list_p->arr[list_p->head - 1];
 
 		return 1;
 	}
@@ -91,20 +105,21 @@ int list_get_last(list_t* list, unsigned int value) {
 
 int list_remove(list_t* list, size_t index, unsigned int* value) {
 	int i;
+	list_pt* list_p = (list_pt*) list;
 
-	if(list != NULL && list->arr != NULL) {
-		if(index > list->head) return 0;
+	if(list_p != NULL && list_p->arr != NULL) {
+		if(index > list_p->head) return 0;
 		if(value != NULL) {
-			*value = list->arr[index];
+			*value = list_p->arr[index];
 		}
 
-		for(i = index + 1; i < list->head; ++i) {
-			list->arr[i-1] = list->arr[i];
+		for(i = index + 1; i < list_p->head; ++i) {
+			list_p->arr[i-1] = list_p->arr[i];
 		}
-		--(list->head);
+		--(list_p->head);
 
-		if(list->head * 2 >= list->size) {
-			list_realloc(list, list->size / 2);
+		if(list_p->head * 2 >= list_p->size) {
+			list_realloc(list_p, list_p->size / 2);
 		}
 
 		return 1;
@@ -114,17 +129,17 @@ int list_remove(list_t* list, size_t index, unsigned int* value) {
 }
 
 int list_remove_last(list_t* list, unsigned int* value) {
-	int i;
+	list_pt* list_p = (list_pt*) list;
 
-	if(list != NULL && list->arr != NULL) {
-		if(list->head == 0) return 0;
+	if(list_p != NULL && list_p->arr != NULL) {
+		if(list_p->head == 0) return 0;
 		if(value != NULL) {
-			*value = list->arr[(list->head) - 1];
+			*value = list_p->arr[(list_p->head) - 1];
 		}
 
-		--(list->head);
-		if(list->head * 2 >= list->size) {
-			list_realloc(list, list->size / 2);
+		--(list_p->head);
+		if(list_p->head * 2 >= list_p->size) {
+			list_realloc(list_p, list_p->size / 2);
 		}
 
 		return 1;
@@ -135,22 +150,25 @@ int list_remove_last(list_t* list, unsigned int* value) {
 
 int list_length(list_t* list) {
 	if(list != NULL) {
-		return (int) list->head;
+		return (int) ((list_pt*)(list))->head;
 	}
 
 	return -1;
 }
 
 int list_destroy(list_t* list) {
-	if(list != NULL && list->arr != NULL) {
-		free(list->arr);
+	list_pt* list_p = (list_pt*) list;
+
+	if(list_p != NULL && list_p->arr != NULL) {
+		free(list_p->arr);
 		return 1;
 	}
 	return 0;
 }
 
-int list_realloc(list_t* list, size_t new_size) {
-	unsigned int placeholder_arr;
+int list_realloc(list_pt* list, size_t new_size) {
+	unsigned int* placeholder_arr;
+
 
 	if(list != NULL) {
 		placeholder_arr = realloc(list->arr, new_size);
