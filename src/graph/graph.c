@@ -44,7 +44,6 @@ graph_t *graph_load (char *filename) {
         
         while(child_string[0] != '#') {
             child = atoi(child_string);
-            g->g[child].id = child;
             list_append(child_list, child);    // Save in list
             fscanf(fp, "%s", child_string);
         }
