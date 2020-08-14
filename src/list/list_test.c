@@ -26,6 +26,7 @@ int main() {
 	assert(list_length(l) == 2);
 
 	list_destroy(l);
+	free(l);
 
 	return 1;
 }
