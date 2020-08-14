@@ -8,8 +8,9 @@
 
 #include "graph.h"
 #include "stdlib.h"
+#include <stdio.h>
 #include "limits.h"
-#include "list.h"
+#include "../list/list.h"
 
 graph_t *graph_load (char *filename) {
     graph_t *g;
@@ -17,8 +18,8 @@ graph_t *graph_load (char *filename) {
     int weight, dir;
     FILE *fp;
     
-    g = (graph_t *) util_calloc (1, sizeof(graph_t));
-    fp = util_fopen (filename, "r");
+    g = (graph_t *) calloc (1, sizeof(graph_t));
+    fp = fopen (filename, "r");
     
     
     unsigned int nodesnumber;
@@ -26,29 +27,30 @@ graph_t *graph_load (char *filename) {
     unsigned int parent, child;
     
     fscanf(fp, "%u", &nodesnumber);
-    sscanf(nodesnumber, "%u", &g->nv);
+    g->nv = nodesnumber;
     g->g = (vertex_t *)
-    util_calloc (g->nv, sizeof(vertex_t));
+    calloc (g->nv, sizeof(vertex_t));
     
     graph_attribute_init (g);    //???where to init???
     
     int i=0,j=0;
     for(i=0;i<nodesnumber;i++){
-        list_t* child_list = malloc(sizeof *child_list);
-        list_init(child_list, A_NUMBER);
+        list_t* child_list = list_create();
+        list_init(child_list, 1);
 
-        fscanf(fp, "%u:", parent);
+        fscanf(fp, "%u:", &parent);
          g->g[parent].id = parent;
 
         fscanf(fp, "%s", child_string);
         
         while(child_string[0] != '#') {
             child = atoi(child_string);
-            list_append(child_list, child);    // Save in list
+            if(list_append(child_list, child) == 0) printf("Error\n");    // Save in list
             fscanf(fp, "%s", child_string);
         }
     
-        g->g[i].rowAdj = (int *)util_calloc(g->nv, sizeof(int));
+
+        g->g[i].rowAdj = child_list;
     }
     
     fclose(fp);

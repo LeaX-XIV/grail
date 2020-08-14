@@ -5,11 +5,11 @@
 //  Created by 郭雅丹 on 2020/8/13.
 //  Copyright © 2020 GUO YADAN. All rights reserved.
 //
+#include "../list/list.h"
 
 #ifndef graph_h
 #define graph_h
 
-#include <stdio.h>
 
 
 
@@ -34,7 +34,7 @@ struct vertex_s {
     int endp_time;
     int pred;
     int scc;
-    int *rowAdj;
+    list_t* rowAdj;
 };
 
 struct edge_s {

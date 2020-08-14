@@ -1,6 +1,8 @@
 #ifndef LIST_HEADER
 #define LIST_HEADER
 
+#include <stdlib.h>
+
 typedef void* list_t;
 
 list_t* list_create();
