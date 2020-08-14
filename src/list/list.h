@@ -14,11 +14,14 @@ int list_insert(list_t* list, unsigned int value, size_t pos);
 
 int list_get(list_t* list, size_t index, unsigned int* value);
 int list_get_last(list_t* list, unsigned int* value);
+int list_contains(list_t* list, unsigned int value);
 
 int list_remove(list_t* list, size_t index, unsigned int* value);
 int list_remove_last(list_t* list, unsigned int* value);
 
 int list_length(list_t* list);
+
+unsigned int* list_as_array(list_t* list);	// FREE IT YOURSELF!!!
 
 int list_destroy(list_t* list);
 

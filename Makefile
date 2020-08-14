@@ -4,7 +4,7 @@ LIBS = -lpthread
 
 ODIR = src/obj
 
-_OBJ = list.o graph.o interval.o
+_OBJ = list.o graph.o interval.o utils.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 grail: $(OBJ)
@@ -22,6 +22,9 @@ src/obj/graph.o: src/graph/graph.c src/graph/graph.h src/obj/list.o src/obj/inte
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 src/obj/interval.o: src/interval/interval.c src/interval/interval.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+src/obj/utils.o: src/utils/utils.c src/utils/utils.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 clean:

@@ -8,9 +8,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+
 #include "graph.h"
 #include "../list/list.h"
 #include "../interval/interval.h"
+#include "../utils/utils.h"
+
+int graph_attribute_init (graph_t*, int);
+list_t* graph_get_roots(graph_t*);
 
 graph_t *graph_load(char *filename, int d) {
 	graph_t *g;
@@ -65,6 +71,9 @@ graph_t *graph_load(char *filename, int d) {
 
 		g->g[i].rowAdj = child_list;
 	}
+
+	// Create threads to geterate labels
+
 
 	g->roots = graph_get_roots(g);
 
@@ -129,4 +138,89 @@ void graph_dispose(graph_t *g) {
 	free(g->g);
 	free(g);
 	return;
+}
+
+
+
+
+
+
+typedef struct {
+	int i;
+	int r;
+	graph_t* G;
+	unsigned int* Roots; // Shuffled
+	interval_t* labels;
+} alg1_p;
+
+
+void graph_randomized_labeling(graph_t* G, int d) {
+	pthread_t threads = malloc(d * sizeof *threads);
+	alg1_p* params = malloc(d * sizeof *params);
+	unsigned int* Roots = list_as_array(G->roots);
+	int i, j;
+	interval_t** labels = malloc(d * sizeof *labels);
+
+	for(i = 0; i < d; ++i) {
+		params[i].i = i;
+		params[i].r = 1;
+		params[i].G = G;
+		if(i % 2 == 0) {	// Randomized Pairs approach
+			params[i].Roots = malloc(list_length(G->roots) * sizeof *Roots);
+			shuffle_array(params[i].Roots);
+		} else {
+			params[i].Roots = malloc(list_length(G->roots) * sizeof *Roots);
+			memcopy(params[i].Roots, params[i-1].Roots, list_length(G->roots) * sizeof *Roots);
+			reverse_array(params[i].Roots, list_length(G->roots));
+		}
+		labels[i] = malloc(G->nv * sizeof *labels[i]);
+		params[i].labels = labels[i];
+
+		pthread_create(&threads[i], NULL, graph_random_visit_w, &params[i]);
+	}
+
+	free(Roots);
+
+	for(i = 0; i < d; ++i) {
+		pthread_join(&threads[i], NULL);
+		free(params[i].Roots);
+	}
+	free(params);
+	free(threads);
+
+	for(i = 0; i < d; ++i) {
+		for(j = 0; j < G->nv; ++j) {
+			list_append(G->g[j].labels[i], labels[i][j]);
+		}
+		free(labels[i]);
+	}
+	free(labels);
+
+	return;
+}
+
+void* graph_random_visit_w(void* arg) {
+	int i = ((alg1_p)arg)->i;
+	int r = ((alg1_p)arg)->r;
+	graph_t* G = ((alg1_p)arg)->G;
+	unsigned int* Roots = ((alg1_p)arg)->G; // Shuffled
+	interval_t* labels = ((alg1_p)arg)->labels;
+	
+	int j;
+
+	for(j = 0; j < list_length(G->roots); ++j) {
+		graph_random_visit(Roots[j], i, G, &r, labels);
+		G->g[Roots[j]].color = BLACK;
+	}
+
+	return arg;
+}
+
+void graph_random_visit(unsigned int x, int i, graph_t* G, int* r, interval_t* labels) {
+	if(G->g[x].colo == BLACK) {	// Already visited
+	// if(labels[x] != NULL) {
+		return;
+	}
+
+	// Continua from line 7
 }

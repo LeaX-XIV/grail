@@ -40,8 +40,6 @@ struct vertex_s {
 
 
 graph_t* graph_load(char*, int);
-int graph_attribute_init (graph_t*, int);
-list_t* graph_get_roots(graph_t*);
 void graph_dispose(graph_t*);
 
 
