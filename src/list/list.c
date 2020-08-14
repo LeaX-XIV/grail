@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "list_p.h"
 
 list_t* list_create() {
@@ -35,8 +36,8 @@ int list_append(list_t* list, unsigned int value) {
 	list_pt* list_p = (list_pt*) list;
 
 	if(list_p != NULL && list_p->arr != NULL) {
-		if(list_p->size == list_p->head) { // Array is full, need reallocation O(n)
-			if(list_realloc(list_p, list_p->size * 2) == 0) {
+		if(list_p->head >= list_p->size) { // Array is full, need reallocation O(n)
+			if(list_realloc(list_p, list_p->size * 2 + 1) == 0) {
 				return 0;
 			}
 		}
@@ -56,8 +57,8 @@ int list_insert(list_t* list, unsigned int value, size_t pos) {
 	if(list_p != NULL && list_p->arr != NULL) {
 		if(pos > list_p->head) return 0;
 
-		if(list_p->size == list_p->head) { // Array is full, need reallocation O(n)
-			if(list_realloc(list_p, list_p->size * 2) == 0) {
+		if(list_p->head >= list_p->size) { // Array is full, need reallocation O(n)
+			if(list_realloc(list_p, list_p->size * 2 + 1) == 0) {
 				return 0;
 			}
 		}
@@ -169,9 +170,8 @@ int list_destroy(list_t* list) {
 int list_realloc(list_pt* list, size_t new_size) {
 	unsigned int* placeholder_arr;
 
-
 	if(list != NULL) {
-		placeholder_arr = realloc(list->arr, new_size);
+		placeholder_arr = realloc(list->arr, new_size * sizeof(*placeholder_arr));
 		if(placeholder_arr == NULL) {
 			return 0;
 		}

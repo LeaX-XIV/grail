@@ -10,8 +10,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 grail: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-test: src/obj/list_test.o src/obj/graph_test.o
-	$(CC) -o $^ $(OBJ) $(CFLAGS) $(LIBS)
+test: $(OBJ)
+	$(CC) src/list/list_test.c $^ -o bin/list_test $(CFLAGS) $(LIBS)
+	$(CC) src/graph/graph_test.c $^ -o bin/graph_test $(CFLAGS) $(LIBS)
+
 
 src/obj/list.o: src/list/list.c src/list/list.h src/list/list_p.h
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -24,5 +26,7 @@ src/obj/interval.o: src/interval/interval.c src/interval/interval.h
 
 clean:
 	rm -f $(ODIR)/*.o
+	rm -f bin/*
 
 .PHONY: clean
+.PHONY: test
