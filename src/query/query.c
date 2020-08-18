@@ -1,10 +1,3 @@
-//
-//  query.c
-//  project
-//
-//  Created by 郭雅丹 on 2020/8/18.
-//  Copyright © 2020 GUO YADAN. All rights reserved.
-//
 
 #include "query.h"
 #include <stdio.h>
@@ -13,15 +6,10 @@
 #include <pthread.h>
 
 
-
-int flag;
-pthread_mutex_t mutex;
-
 int query(int u,int v,graph_t*g,int d){
          
     int f1,f2,s1,s2;
         
-    flag=0;
     
     void* status;
     pthread_t th;
@@ -38,7 +26,9 @@ int query(int u,int v,graph_t*g,int d){
     
     pthread_join(th,&status);
     
-    if(flag>0)
+    int res=(int*)status;
+    
+    if(status==1)
         return 1;
     else
         return 0;
@@ -53,6 +43,9 @@ static void* querythread(void *arg){
     int v;
     graph_t * g;
     int d;
+    
+    int res;
+    int flag=0;
     
     struct thread_data *mydata;
     mydata=(struct thread_data *)arg;
@@ -73,21 +66,19 @@ static void* querythread(void *arg){
         s2=g->g[v].labels[i].second;
         
         if(f1>f2||s1<s2){
-            pthread_exit(NULL);
+            pthread_exit((void *) 0);
         }
         
     }
     
     if(g->g[u].rowAdj.contains(g->g[v].id)||g->g[u].id==g->g[v].id){
-        flag++;
-        pthread_exit(NULL);
+        pthread_exit((void *) 1);
     }
     
     
     int s=sizeof(g->g[u].rowAdj);
     
     pthread_t *th=(pthread_t *)malloc(sizeof(pthread_t)*s);
-    
     void* status;
     int retcode;
     
@@ -101,17 +92,22 @@ static void* querythread(void *arg){
         
         retcode=pthread_create(&th[j], NULL, querythread, &uv);
         if (retcode != 0)
-            fprintf (stderr, "create GET failed %d\n", retcode);
-        
+            fprintf (stderr, "create GET failed in querythread %d\n", retcode);
     }
     
     for(int j=0;j<s;j++){
         
          pthread_join(th[j],&status);
+         res=(int*)status;
+         if(res==1)
+             flag=1;
         
     }
 
-    pthread_exit(NULL);
+    if(flag==1)
+        pthread_exit((void *) 1);
+    else
+        pthread_exit((void *) 0);
 }
 
 
@@ -129,13 +125,15 @@ static void* filereadthread(void *arg){
         pthread_mutex_lock(&mutex);
         retVal = fscanf (filedata->fp, "%d%d", &u,&v);
         pthread_mutex_unlock(&mutex);
-    
-        res=query(u,v,g,g->nv);
-        if(res==1)
-            fprintf (stdout, "query: %d and %d is reachable\n",u, v);
-        else
-            fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
         
+        if (retVal!=EOF) {
+    
+            res=query(u,v,g,g->nv);
+            if(res==1)
+                fprintf (stdout, "query: %d and %d is reachable\n",u, v);
+            else
+                fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
+        }
     }while(retVal!=EOF)
         
     pthread_exit(NULL);
