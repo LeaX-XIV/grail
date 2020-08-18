@@ -14,7 +14,7 @@
 
 
 
-enum {WHITE, GREY, BLACK};
+// enum {WHITE, GREY, BLACK};
 
 
 typedef struct graph_s graph_t;
@@ -24,16 +24,17 @@ struct graph_s {
     vertex_t *g;
     unsigned int nv;
     list_t* roots;
+    int d;
 };
 
 struct vertex_s {
     unsigned int id;
-    int color;
+    // int color;
     // int discovery_time;
     // int end_time;
-    int pred;
+    // int pred;
     list_t* rowAdj;
-    interval_t* labels;
+    interval_t** labels;
 };
 
 
