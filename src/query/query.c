@@ -3,14 +3,13 @@
 #include <stdio.h>
 #include "..list/list.h"
 #include "..graph/graph.h"
+#include "..interval/interval.h"
 #include <pthread.h>
 
 
 int query(int u,int v,graph_t*g,int d){
          
-    int f1,f2,s1,s2;
-        
-    
+
     void* status;
     pthread_t th;
     int retcode;
@@ -55,17 +54,8 @@ static void* querythread(void *arg){
     g=mydata->g;
     d=mydata->d;
     
-    
-    int f1,f2,s1,s2;
-    
     for(int i=0;i<d;i++){
-        
-        f1=g->g[u].labels[i].first;
-        f2=g->g[v].labels[i].first;
-        s1=g->g[u].labels[i].second;
-        s2=g->g[v].labels[i].second;
-        
-        if(f1>f2||s1<s2){
+        if(interval_check(g->g[u].labels[i],g->g[v].labels[i])!=1){
             pthread_exit((void *) 0);
         }
         
