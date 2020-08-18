@@ -28,18 +28,6 @@ int query(int u,int v,graph_t*g,int d){
          
     int f1,f2,s1,s2;
         
-    for(int i=0;i<d;i++){
-            
-        f1=g->g[u].labels[i].first;
-        f2=g->g[v].labels[i].first;
-        s1=g->g[u].labels[i].second;
-        s2=g->g[v].labels[i].second;
-            
-        if(f1>f2||s1<s2){
-            return 0;
-        }
-    }
-    
     flag=0;
     
     void* status;
@@ -75,6 +63,7 @@ static void* querythread(void *arg){
     
     struct thread_data *mydata;
     mydata=(struct thread_data *)arg;
+    
     u=mydata->u;
     v=mydata->v;
     g=mydata->g;
@@ -91,15 +80,14 @@ static void* querythread(void *arg){
         s2=g->g[v].labels[i].second;
         
         if(f1>f2||s1<s2){
-            flag+=0;
-            return 0;
+            pthread_exit(NULL);
         }
         
     }
     
     if(g->g[u].rowAdj.contains(g->g[v].id)||g->g[u].id==g->g[v].id){
         flag++;
-        return 0;
+        pthread_exit(NULL);
     }
     
     
@@ -130,5 +118,5 @@ static void* querythread(void *arg){
         
     }
 
-    
+    pthread_exit(NULL);
 }
