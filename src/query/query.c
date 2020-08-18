@@ -1,9 +1,9 @@
 
 #include "query.h"
 #include <stdio.h>
-#include "..list/list.h"
-#include "..graph/graph.h"
-#include "..interval/interval.h"
+#include "../list/list.h"
+#include "../graph/graph.h"
+#include "../interval/interval.h"
 #include <pthread.h>
 
 
@@ -24,19 +24,14 @@ int query(int u,int v,graph_t*g,int d){
         fprintf (stderr, "create GET failed %d\n", retcode);
     
     pthread_join(th,&status);
-    
-    int res=(int*)status;
-    
-    if(status==1)
-        return 1;
-    else
-        return 0;
+
+    return *((int*) status);
      
 }
 
 
 
-static void* querythread(void *arg){
+void* querythread(void *arg){
     
     int u;
     int v;
@@ -61,7 +56,7 @@ static void* querythread(void *arg){
         
     }
     
-    if(g->g[u].rowAdj.contains(g->g[v].id)||g->g[u].id==g->g[v].id){
+    if(list_contains(g->g[u].rowAdj, g->g[v].id)||g->g[u].id==g->g[v].id){
         pthread_exit((void *) 1);
     }
     
@@ -72,10 +67,10 @@ static void* querythread(void *arg){
     void* status;
     int retcode;
     
-    for(int j=0;j<s;j++){
+    for(unsigned int j=0;j<s;j++){
         
         struct thread_data uv;
-        uv.u=g->g[u].rowAdj[j];
+        uv.u=list_get(g->g[u].rowAdj, list_length(g->g[u].rowAdj), &j);
         uv.v=v;
         uv.g=g;
         uv.d=d;
@@ -88,7 +83,7 @@ static void* querythread(void *arg){
     for(int j=0;j<s;j++){
         
          pthread_join(th[j],&status);
-         res=(int*)status;
+         res=*((int*)status);
          if(res==1)
              flag=1;
         
@@ -101,20 +96,20 @@ static void* querythread(void *arg){
 }
 
 
-static void* filereadthread(void *arg){
+void* filereadthread(void *arg){
     
     int u,v,retVal,res;
     graph_t * g;
     struct file_data *filedata;
     filedata=(struct file_data *)arg;
-    
     g=filedata->g;
+    pthread_mutex_t* mutex = filedata->mutex;
     
     do{
     
-        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(mutex);
         retVal = fscanf (filedata->fp, "%d%d", &u,&v);
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(mutex);
         
         if (retVal!=EOF) {
     
@@ -124,7 +119,7 @@ static void* filereadthread(void *arg){
             else
                 fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
         }
-    }while(retVal!=EOF)
+    }while(retVal!=EOF);
         
-    pthread_exit(NULL);
+    return arg;
 }
