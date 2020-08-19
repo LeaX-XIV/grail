@@ -11,15 +11,15 @@
 #ifndef graph_h
 #define graph_h
 
-
-
-
-// enum {WHITE, GREY, BLACK};
-
-
 typedef struct graph_s graph_t;
 typedef struct vertex_s vertex_t;
- 
+
+struct vertex_s {
+    unsigned int id;
+    list_t* rowAdj;
+    interval_t** labels;
+};
+
 struct graph_s {
     vertex_t *g;
     unsigned int nv;
@@ -27,25 +27,8 @@ struct graph_s {
     int d;
 };
 
-struct vertex_s {
-    unsigned int id;
-    // int color;
-    // int discovery_time;
-    // int end_time;
-    // int pred;
-    list_t* rowAdj;
-    interval_t** labels;
-};
-
-
-
-
 graph_t* graph_load(char*, int);
+int graph_reachable(graph_t* g, int u, int v);
 void graph_dispose(graph_t*);
-
-
-
-
-
 
 #endif /* graph_h */

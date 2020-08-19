@@ -1,14 +1,7 @@
-//
-//  interval.c
-//  project
-//
-//  Created by 郭雅丹 on 2020/8/14.
-//  Copyright © 2020 GUO YADAN. All rights reserved.
-//
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "interval.h"
-#include "stdlib.h"
-#include <stdio.h>
 
 interval_t* interval_create(int first, int second){
     interval_t* i;

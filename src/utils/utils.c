@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+
 #include "utils.h"
 
 int max(int a, int b) {

@@ -1,27 +1,12 @@
-//
-//  graph.c
-//  project
-//
-//  Created by 郭雅丹 on 2020/8/13.
-//  Copyright © 2020 GUO YADAN. All rights reserved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 
-#include "graph.h"
+#include "graph_p.h"
 #include "../list/list.h"
 #include "../interval/interval.h"
 #include "../utils/utils.h"
-
-int graph_attribute_init (graph_t*);
-list_t* graph_get_roots(graph_t*);
-
-void graph_randomized_labeling(graph_t* g);
-void* graph_random_visit_w(void* arg);
-void graph_random_visit(unsigned int x, int i, graph_t* G, int* r);
 
 graph_t *graph_load(char *filename, int d) {
 	graph_t *g;
@@ -78,9 +63,6 @@ graph_t *graph_load(char *filename, int d) {
 		g->g[i].rowAdj = child_list;
 	}
 
-	// Create threads to geterate labels
-
-
 	g->roots = graph_get_roots(g);
 
 	graph_randomized_labeling(g);
@@ -93,11 +75,6 @@ int graph_attribute_init(graph_t *g) {
 	int i, j, error = 0;
 	for(i = 0; i < g->nv; i++) {
 		g->g[i].id = i;
-		// g->g[i].color = WHITE;
-		// g->g[i].disc_time = -1;
-		// g->g[i].endp_time = -1;
-		// g->g[i].pred = -1;
-		// g->g[i].rowAdj taken care with file read
 		g->g[i].labels = malloc(g->d * sizeof(*g->g[i].labels));
 		if(g->g[i].labels == NULL) {
 			error = 1;
@@ -179,15 +156,15 @@ void graph_randomized_labeling(graph_t* G) {
 		// 2
 		params[i].r = 1;
 		params[i].G = G;
-		if(i % 2 == 0) {	// Randomized Pairs approach
+		// if(i % 2 == 0) {	// Randomized Pairs approach
 			params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
 			memcpy(params[i].Roots, Roots, list_length(G->roots) * sizeof(*Roots));
 			shuffle_array(params[i].Roots, list_length(G->roots));
-		} else {
-			params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
-			memcpy(params[i].Roots, params[i-1].Roots, list_length(G->roots) * sizeof(*Roots));
-			reverse_array(params[i].Roots, list_length(G->roots));
-		}
+		// } else {
+		// 	params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
+		// 	memcpy(params[i].Roots, params[i-1].Roots, list_length(G->roots) * sizeof(*Roots));
+		// 	reverse_array(params[i].Roots, list_length(G->roots));
+		// }
 
 		pthread_create(&threads[i], NULL, graph_random_visit_w, &params[i]);
 	}
@@ -247,4 +224,29 @@ void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 	G->g[x].labels[i] = interval_create(min(*r, r_star_c), *r);
 	// 11
 	++(*r);
+}
+
+int graph_reachable(graph_t* g, int u, int v) {
+    for(int i=0;i<g->d;i++){
+        if(interval_check(g->g[u].labels[i],g->g[v].labels[i]) == 0){
+            return 0;
+        }
+        
+    }
+    
+    if(list_contains(g->g[u].rowAdj, g->g[v].id)||g->g[u].id==g->g[v].id){
+        return 1;
+    }
+    
+    int s=list_length(g->g[u].rowAdj);
+
+    for(int j=0;j<s;j++){
+        unsigned int c;
+        list_get(g->g[u].rowAdj, j, &c);
+        if(graph_reachable(g, c, v) == 1) {
+            return 1;
+        } 
+    }
+
+    return 0;
 }
