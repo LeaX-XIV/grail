@@ -16,11 +16,10 @@ struct thread_data{
     int u;
     int v;
     graph_t *g;
-    int d;
 };
 
 void* filereadthread(void *arg);
-void* querythread(void *arg);
-int query(int u,int v,graph_t*g,int d);
+// int querythread(void *arg);
+int query(int u,int v,graph_t*g);
 
 #endif /* query_h */

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -O3
 LIBS = -lpthread
 
 ODIR = src/obj

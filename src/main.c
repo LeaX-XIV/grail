@@ -5,12 +5,19 @@
 #include "query/query.h"
 #include <pthread.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
+#include <sys/sysinfo.h>
 
 pthread_mutex_t mutex;
 
 int main(int argc, char * argv[]) {
     
+    srand(time(0));
+
+    int nproc = get_nprocs_conf();
+    // int nproc = 4;
+    printf("%d\n", nproc);
 
     int d;
     d=atoi(argv[2]);
@@ -32,13 +39,13 @@ int main(int argc, char * argv[]) {
     f.g = g;
     f.fp = fp;
     f.mutex = &mutex;
-    for(int i=0;i<4;i++){
+    for(int i=0;i<nproc;i++){
       retcode=pthread_create(&th[i], NULL, filereadthread, &f);
       if (retcode != 0)
           fprintf (stderr, "create GET failed in main %d\n", retcode);
     }
     
-    for(int j=0;j<4;j++){
+    for(int j=0;j<nproc;j++){
          pthread_join(th[j],&status);
     }
 

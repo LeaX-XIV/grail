@@ -30,6 +30,7 @@
 
 # Executables
 bin/*
+grail
 *.exe
 *.out
 *.app
@@ -45,6 +46,7 @@ bin/*
 
 # Graph files
 *.gra
+*.que
 
 # Kernel Module Compile Results
 *.mod*
