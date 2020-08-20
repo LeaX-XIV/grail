@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -19,6 +20,7 @@ int main(int argc, char * argv[]) {
     
     srand(time(0));
 
+
     int nproc = get_nprocs_conf();
     // int nproc = 4;
 
@@ -32,8 +34,13 @@ int main(int argc, char * argv[]) {
     pthread_t* th = malloc(nproc * sizeof(*th));
     struct file_data f;
     
+    time_t s1,s2,s3,s4;
+    s1 = time(NULL);
+        
     graph_t * g=graph_load(argv[1],d);
     
+    s2 = time(NULL)-s1;
+        
     FILE *fp=fopen(argv[3], "r");
     pthread_mutex_t mutex;
     pthread_mutex_init(&mutex,NULL);
@@ -60,7 +67,9 @@ int main(int argc, char * argv[]) {
     f.mutex = &mutex;
     f.results = results;
     f.i = &index;
-
+    
+     s3 = time(NULL);
+    
     for(i=0;i<nproc;i++){
       retcode=pthread_create(&th[i], NULL, filereadthread, &f);
       if (retcode != 0)
@@ -72,7 +81,7 @@ int main(int argc, char * argv[]) {
     }
     
     fseek(fp, 0, SEEK_SET);
-
+    
     for(i = 0; i < n_lines; ++i) {
         fscanf (fp, "%d%d", &u,&v);
         if(f.results[i]==1)
@@ -81,7 +90,13 @@ int main(int argc, char * argv[]) {
             fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
     }
 
+    s4 = time(NULL)-s3;
+    
     printf("query finish..\n");
+    
+    printf("time for structure %ld\n", s2);
+    printf("time for query %ld\n", s4);
+    
     free(results);
     pthread_mutex_destroy(&mutex);
     graph_dispose(g);
