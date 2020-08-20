@@ -29,6 +29,7 @@ struct graph_s {
 
 graph_t* graph_load(char*, int);
 int graph_reachable(graph_t* g, int u, int v);
+size_t graph_size(graph_t* g);
 void graph_dispose(graph_t*);
 
 #endif /* graph_h */

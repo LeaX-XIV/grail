@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -20,7 +19,7 @@ int main(int argc, char * argv[]) {
         return EXIT_SUCCESS;
     }
     
-    srand(time(0));
+    srand(time(NULL));
 
 
     int nproc = get_nprocs_conf();
@@ -99,6 +98,7 @@ int main(int argc, char * argv[]) {
     printf("query finish..\n");
     
     printf("time for structure %d us\n", timeuse1);
+    printf("Size: %ld bytes\n", graph_size(g));
     printf("time for query %d us\n", timeuse2);
     
     free(results);

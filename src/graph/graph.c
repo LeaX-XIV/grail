@@ -73,6 +73,9 @@ graph_t *graph_load(char *filename, int d) {
 }
 
 int graph_attribute_init(graph_t *g) {
+	if(g == NULL)
+		return 0;
+
 	int i, j, error = 0;
 	for(i = 0; i < g->nv; i++) {
 		g->g[i].id = i;
@@ -91,6 +94,9 @@ int graph_attribute_init(graph_t *g) {
 }
 
 list_t* graph_get_roots(graph_t* graph) {
+	if(graph == NULL)
+		return NULL;
+
 	int* indegree = calloc(graph->nv, sizeof(*indegree));
 	int i, j;
 	unsigned int v;
@@ -116,7 +122,27 @@ list_t* graph_get_roots(graph_t* graph) {
 	return roots;
 }
 
+size_t graph_size(graph_t* g) {
+	if(g == NULL) 
+	return 0;
+
+	size_t size = sizeof(*g) +	// graph_t struct
+		g->nv * (
+			sizeof(vertex_t) +	// Array of vertex_t
+			g->d * sizeof(interval_t)	// Array of interval_t
+		) + 
+		list_length(g->roots) * sizeof(unsigned int) + 2 * sizeof(size_t);	// List of roots
+	for(int i = 0; i < g->nv; ++i) {
+		size += list_length(g->g[i].rowAdj) * sizeof(unsigned int) + 2 * sizeof(size_t);	// List of adjacent nodes for every node
+	}
+
+	return size;
+}
+
 void graph_dispose(graph_t *g) {
+	if(g == NULL)
+		return;
+
 	int i, j;
 	for(i = 0; i < g->nv; i++) {
 		for(j = 0; j < g->d; ++j) {
@@ -130,10 +156,12 @@ void graph_dispose(graph_t *g) {
 	free(g->roots);
 	free(g->g);
 	free(g);
-	return;
 }
 
 void graph_randomized_labeling(graph_t* G) {
+	if(G == NULL)
+		return;
+		
 	pthread_t* threads = malloc(G->d * sizeof(*threads));
 	alg1_t* params = malloc(G->d * sizeof(*params));
 	// 3

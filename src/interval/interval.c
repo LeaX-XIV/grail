@@ -29,7 +29,8 @@ int interval_second(interval_t* i){
 }
 
 int interval_check(interval_t* i1, interval_t* i2){
-    
+    if(i1 == NULL || i2 == NULL)
+        return 0;
     int f1,f2,s1,s2;
     f1=i1->first;
     f2=i2->first;
@@ -44,7 +45,8 @@ int interval_check(interval_t* i1, interval_t* i2){
 }
 
 void interval_destroy(interval_t* i){
-    
+    if(i == NULL)
+        return;
     free(i);
     
 }
