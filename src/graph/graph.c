@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +22,7 @@ graph_t *graph_load(char *filename, int d) {
 		return NULL;
 
 	g->d = d;
-	g->roots = list_create();
+	// g->roots = list_create();
 
 	fp = fopen(filename, "r");
 	if(fp == NULL) {
@@ -75,7 +76,7 @@ int graph_attribute_init(graph_t *g) {
 	int i, j, error = 0;
 	for(i = 0; i < g->nv; i++) {
 		g->g[i].id = i;
-		g->g[i].labels = malloc(g->d * sizeof(*g->g[i].labels));
+		g->g[i].labels = calloc(g->d, sizeof(*g->g[i].labels));
 		if(g->g[i].labels == NULL) {
 			error = 1;
 			break;
@@ -110,6 +111,8 @@ list_t* graph_get_roots(graph_t* graph) {
 		}
 	}
 
+	free(indegree);
+
 	return roots;
 }
 
@@ -130,22 +133,9 @@ void graph_dispose(graph_t *g) {
 	return;
 }
 
-
-
-
-
-
-typedef struct {
-	int i;
-	int r;
-	graph_t* G;
-	unsigned int* Roots; // Shuffled
-} alg1_p;
-
-
 void graph_randomized_labeling(graph_t* G) {
 	pthread_t* threads = malloc(G->d * sizeof(*threads));
-	alg1_p* params = malloc(G->d * sizeof(*params));
+	alg1_t* params = malloc(G->d * sizeof(*params));
 	// 3
 	unsigned int* Roots = list_as_array(G->roots);
 	int i;
@@ -182,10 +172,10 @@ void graph_randomized_labeling(graph_t* G) {
 }
 
 void* graph_random_visit_w(void* arg) {
-	int i = ((alg1_p*)arg)->i;
-	int r = ((alg1_p*)arg)->r;
-	graph_t* G = ((alg1_p*)arg)->G;
-	unsigned int* Roots = ((alg1_p*)arg)->Roots; // Shuffled
+	int i = ((alg1_t*)arg)->i;
+	int r = ((alg1_t*)arg)->r;
+	graph_t* G = ((alg1_t*)arg)->G;
+	unsigned int* Roots = ((alg1_t*)arg)->Roots; // Shuffled
 	int j;
 
 	// 4
@@ -208,7 +198,7 @@ void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 	// 7
 	unsigned int* children_of_x = list_as_array(G->g[x].rowAdj);
 	int n_children = list_length(G->g[x].rowAdj);
-	int r_star_c = ~(1 << 31);
+	int r_star_c = INT_MAX;
 	int j;
 	shuffle_array(children_of_x, n_children);
 	for(j = 0; j < n_children; ++j) {

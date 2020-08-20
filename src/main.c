@@ -54,6 +54,7 @@ int main(int argc, char * argv[]) {
 
     printf("query finish..\n");
     pthread_mutex_destroy(&mutex);
+    graph_dispose(g);
     fclose(fp);
     free(th);
     return EXIT_SUCCESS;
