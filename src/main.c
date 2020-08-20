@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/sysinfo.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "list/list.h"
 #include "graph/graph.h"
 #include "query/query.h"
+
 
 
 int main(int argc, char * argv[]) {
@@ -34,12 +36,13 @@ int main(int argc, char * argv[]) {
     pthread_t* th = malloc(nproc * sizeof(*th));
     struct file_data f;
     
-    time_t s1,s2,s3,s4;
-    s1 = time(NULL);
+    struct timeval s1,s2,s3,s4;
+    gettimeofday( &s1, NULL );
         
     graph_t * g=graph_load(argv[1],d);
     
-    s2 = time(NULL)-s1;
+    gettimeofday( &s2, NULL );
+    int timeuse1 = 1000000 * ( s2.tv_sec - s1.tv_sec ) + s2.tv_usec - s1.tv_usec;
         
     FILE *fp=fopen(argv[3], "r");
     pthread_mutex_t mutex;
@@ -68,7 +71,7 @@ int main(int argc, char * argv[]) {
     f.results = results;
     f.i = &index;
     
-     s3 = time(NULL);
+    gettimeofday( &s3, NULL );
     
     for(i=0;i<nproc;i++){
       retcode=pthread_create(&th[i], NULL, filereadthread, &f);
@@ -90,12 +93,13 @@ int main(int argc, char * argv[]) {
             fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
     }
 
-    s4 = time(NULL)-s3;
+    gettimeofday( &s4, NULL );
+    int timeuse2 = 1000000 * ( s4.tv_sec - s3.tv_sec ) + s4.tv_usec - s3.tv_usec;
     
     printf("query finish..\n");
     
-    printf("time for structure %ld\n", s2);
-    printf("time for query %ld\n", s4);
+    printf("time for structure %d us\n", timeuse1);
+    printf("time for query %d us\n", timeuse2);
     
     free(results);
     pthread_mutex_destroy(&mutex);
