@@ -13,10 +13,12 @@ void* filereadthread(void *arg){
     filedata=(struct file_data *)arg;
     g=filedata->g;
     pthread_mutex_t* mutex = filedata->mutex;
+    int* results = filedata->results;
+    int* i = filedata->i;
     
     do{
-    
         pthread_mutex_lock(mutex);
+        int index = (*i)++;
         retVal = fscanf (filedata->fp, "%d%d", &u,&v);
         pthread_mutex_unlock(mutex);
         
@@ -24,12 +26,14 @@ void* filereadthread(void *arg){
     
             res=graph_reachable(g, u, v);
 
-            pthread_mutex_lock(mutex);
-            if(res==1)
-                fprintf (stdout, "query: %d and %d is reachable\n",u, v);
-            else
-                fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
-            pthread_mutex_unlock(mutex);
+            results[index] = res;
+
+            // pthread_mutex_lock(mutex);
+            // if(res==1)
+            //     fprintf (stdout, "query: %d and %d is reachable\n",u, v);
+            // else
+            //     fprintf (stdout, "query: %d and %d is not reachable\n",u, v);
+            // pthread_mutex_unlock(mutex);
         }
     }while(retVal!=EOF);
         

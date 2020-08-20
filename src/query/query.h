@@ -11,6 +11,8 @@ struct file_data{
     graph_t *g;
     FILE *fp;
     pthread_mutex_t* mutex;
+    int* results;
+    int* i;
 };
 
 void* filereadthread(void *arg);
