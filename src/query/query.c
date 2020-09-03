@@ -13,7 +13,7 @@ void* filereadthread(void *arg){
     filedata=(struct file_data *)arg;
     g=filedata->g;
     pthread_mutex_t* mutex = filedata->mutex;
-    int* results = filedata->results;
+    char* results = filedata->results;
     int* i = filedata->i;
     
     do{
@@ -26,7 +26,7 @@ void* filereadthread(void *arg){
     
             res=graph_reachable(g, u, v);
 
-            results[index] = res;
+            results[index] = (char)res;
 
             // pthread_mutex_lock(mutex);
             // if(res==1)

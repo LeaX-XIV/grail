@@ -29,7 +29,7 @@ int main(int argc, char * argv[]) {
     int n_lines = 0;
     int index = 0;
     int i, u, v;
-    int* results;
+    char* results;
     
     int retcode;
     pthread_t* th = malloc(nproc * sizeof(*th));
