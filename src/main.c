@@ -15,7 +15,7 @@
 int main(int argc, char * argv[]) {
 
     if(argc < 4) {
-        fprintf(stdout, "Expeted arguments in the from of:\n\tgrail <graph_file> <d> <query_file>");
+        fprintf(stdout, "Expeted arguments in the from of:\n\tgrail <graph_file> <d> <query_file>\n");
         return EXIT_SUCCESS;
     }
     
