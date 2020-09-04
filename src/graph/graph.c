@@ -219,7 +219,6 @@ void* graph_random_visit_w(void* arg) {
 void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 	// 6
 	if(G->g[x].labels[i] != NULL) {
-	// if(G->g[x].color == BLACK) {	// Already visited
 		return;
 	}
 
@@ -233,7 +232,6 @@ void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 		unsigned int y = children_of_x[j];
 		// 8
 		graph_random_visit(y, i, G, r);
-		// G->g[y].color = BLACK;
 		// 9
 		r_star_c = min(r_star_c, interval_first(G->g[y].labels[i]));
 	}
@@ -245,7 +243,8 @@ void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 }
 
 int graph_reachable(graph_t* g, int u, int v) {
-    for(int i=0;i<g->d;i++){
+    int i;
+	for(i=0;i<g->d;i++){
         if(interval_check(g->g[u].labels[i],g->g[v].labels[i]) == 0){
             return 0;
         }
@@ -258,9 +257,9 @@ int graph_reachable(graph_t* g, int u, int v) {
     
     int s=list_length(g->g[u].rowAdj);
 
-    for(int j=0;j<s;j++){
+    for(i=0;i<s;i++){
         unsigned int c;
-        list_get(g->g[u].rowAdj, j, &c);
+        list_get(g->g[u].rowAdj, i, &c);
         if(graph_reachable(g, c, v) == 1) {
             return 1;
         } 

@@ -1,17 +1,17 @@
 CC = gcc
-# CFLAGS = -Wall -g -Og
-CFLAGS = -O3
+CFLAGS = -Wall -g
+# CFLAGS = -O3
 LIBS = -lpthread
 MKDCMD = mkdir -p
 
 ODIR = src/obj
 
-_OBJ = list.o graph.o interval.o utils.o query.o main.o
+_OBJ = list.o graph.o interval.o utils.o query.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 BDIR = bin
 
-grail: $(OBJ)
+grail: $(OBJ) $(patsubst %,$(ODIR)/%,main.o)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 # Target broken

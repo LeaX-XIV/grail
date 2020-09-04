@@ -6,7 +6,7 @@
 interval_t* interval_create(int first, int second){
     interval_t* i;
     
-    i = (interval_t*) calloc (1, sizeof(interval_t));
+    i = calloc (1, sizeof(*i));
     
     i->first=first;
     i->second=second;
@@ -50,6 +50,3 @@ void interval_destroy(interval_t* i){
     free(i);
     
 }
-
-
-

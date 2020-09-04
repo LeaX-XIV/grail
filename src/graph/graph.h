@@ -26,10 +26,15 @@ struct graph_s {
     list_t* roots;
     int d;
 };
-
-graph_t* graph_load(char*, int);
+// n: number of nodes
+// m: number of edges
+// Load a graph from file to memory, initializing d labels per node: O(n * m)
+graph_t* graph_load(char* filename, int d);
+// Returns 1 if v is reachable from u in graph g using DFS: between O(d) and O(n + m)
 int graph_reachable(graph_t* g, int u, int v);
+// Returns the size of the structure in bytes: O(n)
 size_t graph_size(graph_t* g);
-void graph_dispose(graph_t*);
+// Frees the graph
+void graph_dispose(graph_t* g);
 
 #endif /* graph_h */

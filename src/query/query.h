@@ -7,7 +7,7 @@
 
 #include "../graph/graph.h"
 
-struct file_data{
+struct alg2{
     graph_t *g;
     FILE *fp;
     pthread_mutex_t* mutex;
@@ -15,6 +15,7 @@ struct file_data{
     int* i;
 };
 
+// Read a line from file pointed by arg until EOF, and for every line checks if the couple of nodes are reachable
 void* filereadthread(void *arg);
 
 #endif /* query_h */
