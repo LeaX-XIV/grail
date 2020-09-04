@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -g
-# CFLAGS = -O3
+# CFLAGS = -Wall -g
+CFLAGS = -O3
 LIBS = -lpthread
 MKDCMD = mkdir -p
 
