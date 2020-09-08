@@ -111,7 +111,7 @@ int list_contains(list_t* list, unsigned int value) {
 	int i;
 
 	if(list_p != NULL && list_p->arr != NULL) {
-		for(i = 0; i < list_p->size; ++i) {
+		for(i = 0; i < list_p->head; ++i) {
 			if(list_p->arr[i] == value) {
 				return 1;
 			}
@@ -178,12 +178,12 @@ unsigned int* list_as_array(list_t* list) {
 	list_pt* list_p = (list_pt*) list;
 
 	if(list_p != NULL && list_p->arr != NULL) {
-		unsigned int* ret_array = malloc(list_p->size * sizeof(*ret_array));
+		unsigned int* ret_array = malloc(list_p->head * sizeof(*ret_array));
 		if(ret_array == NULL) {
 			return NULL;
 		}
 
-		memcpy(ret_array, list_p->arr, list_p->size * sizeof(*ret_array));
+		memcpy(ret_array, list_p->arr, list_p->head * sizeof(*ret_array));
 		return ret_array;
 	}
 	return NULL;
