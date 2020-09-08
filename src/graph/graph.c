@@ -174,20 +174,15 @@ void graph_randomized_labeling(graph_t* G) {
 		// 2
 		params[i].r = 1;
 		params[i].G = G;
-		// if(i % 2 == 0) {	// Randomized Pairs approach
-			params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
-			memcpy(params[i].Roots, Roots, list_length(G->roots) * sizeof(*Roots));
-			shuffle_array(params[i].Roots, list_length(G->roots));
-		// } else {
-		// 	params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
-		// 	memcpy(params[i].Roots, params[i-1].Roots, list_length(G->roots) * sizeof(*Roots));
-		// 	reverse_array(params[i].Roots, list_length(G->roots));
-		// }
+		
+		params[i].Roots = malloc(list_length(G->roots) * sizeof(*Roots));
+		memcpy(params[i].Roots, Roots, list_length(G->roots) * sizeof(*Roots));
+		shuffle_array(params[i].Roots, list_length(G->roots));
 
 		pthread_create(&threads[i], NULL, graph_random_visit_w, &params[i]);
 	}
-
 	free(Roots);
+
 
 	for(i = 0; i < G->d; ++i) {
 		pthread_join(threads[i], NULL);
@@ -210,7 +205,6 @@ void* graph_random_visit_w(void* arg) {
 	for(j = 0; j < list_length(G->roots); ++j) {
 		// 5
 		graph_random_visit(Roots[j], i, G, &r);
-		// G->g[Roots[j]].color = BLACK;
 	}
 
 	return arg;
@@ -243,27 +237,34 @@ void graph_random_visit(unsigned int x, int i, graph_t* G, int* r) {
 }
 
 int graph_reachable(graph_t* g, int u, int v) {
-    int i;
+	int i;
 	for(i=0;i<g->d;i++){
-        if(interval_check(g->g[u].labels[i],g->g[v].labels[i]) == 0){
-            return 0;
-        }
-        
-    }
-    
-    if(list_contains(g->g[u].rowAdj, g->g[v].id)||g->g[u].id==g->g[v].id){
-        return 1;
-    }
-    
-    int s=list_length(g->g[u].rowAdj);
+		if(interval_check(g->g[u].labels[i],g->g[v].labels[i]) == 0){
+			return 0;
+		} 
+	}
+	
+	if(list_contains(g->g[u].rowAdj, g->g[v].id)||g->g[u].id==g->g[v].id){
+		return 1;
+	}
+	
+	int s=list_length(g->g[u].rowAdj);
 
-    for(i=0;i<s;i++){
-        unsigned int c;
-        list_get(g->g[u].rowAdj, i, &c);
-        if(graph_reachable(g, c, v) == 1) {
-            return 1;
-        } 
-    }
+	for(i=0;i<s;i++){
+		unsigned int c;
+		int b = 1;
+		int j;
 
-    return 0;
+		list_get(g->g[u].rowAdj, i, &c);
+
+		for(int j = 0; j < g->d; ++j) {
+			b &= interval_check(g->g[c].labels[j], g->g[v].labels[j]);
+		}
+
+		if(b == 1 && graph_reachable(g, c, v) == 1){
+			return 1;
+		} 
+	}
+
+	return 0;
 }
