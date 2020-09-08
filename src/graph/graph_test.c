@@ -3,9 +3,9 @@
 #include "../interval/interval.h"
 #include <stdio.h>
 
-int main() {
+int main(int argc, char* argv[]) {
 	int i, j;
-	graph_t* g = graph_load("v100e10.gra", 3);
+	graph_t* g = graph_load(argv[1], 3);
 	unsigned int v = 5;
 	// list_get(g->g[0].rowAdj, 0, &v);
 	// printf("%u\n", v);
