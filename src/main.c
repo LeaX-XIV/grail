@@ -30,6 +30,7 @@ int main(int argc, char * argv[]) {
 	int index = 0;
 	int i, u, v;
 	char* results;
+	int n_reach = 0;
 	
 	int retcode;
 	pthread_t* th = malloc(nproc * sizeof(*th));
@@ -42,6 +43,8 @@ int main(int argc, char * argv[]) {
 	
 	gettimeofday( &s2, NULL );
 	int timeuse1 = 1000000 * ( s2.tv_sec - s1.tv_sec ) + s2.tv_usec - s1.tv_usec;
+
+	printf("Index created\n");
 		
 	FILE *fp=fopen(argv[3], "r");
 	pthread_mutex_t mutex;
@@ -69,6 +72,8 @@ int main(int argc, char * argv[]) {
 	f.mutex = &mutex;
 	f.results = results;
 	f.i = &index;
+
+	printf("Starting query execution, %d threads\n", nproc);
 	
 	gettimeofday( &s3, NULL );
 	
@@ -93,25 +98,28 @@ int main(int argc, char * argv[]) {
 	for(i=0; i < nproc; i++){
 		 pthread_join(th[i],NULL);
 	}
+	gettimeofday( &s4, NULL );
+	int timeuse2 = 1000000 * ( s4.tv_sec - s3.tv_sec ) + s4.tv_usec - s3.tv_usec;
 	
 	fseek(fp, 0, SEEK_SET);
-	
+
 	for(i = 0; i < n_lines; ++i) {
 		fscanf (fp, "%d%d", &u,&v);
-		if(f.results[i]==1)
+		if(f.results[i]==1) {
 			fprintf (stdout, "query: %d is reachable from %d\n", v, u);
+			n_reach++;
+		}
 		else
 			fprintf (stdout, "query: %d is not reachable from %d\n", v, u);
 	}
 
-	gettimeofday( &s4, NULL );
-	int timeuse2 = 1000000 * ( s4.tv_sec - s3.tv_sec ) + s4.tv_usec - s3.tv_usec;
 	
-	printf("query finish..\n");
+	printf("\n\n\n");
 	
 	printf("Time to create the index: %d us\n", timeuse1);
 	printf("Size of the index: %ld bytes\n", graph_size(g));
 	printf("Time to execute %d queries: %d us, with an average of %.2f us per query\n", n_lines, timeuse2, ((float)timeuse2 / n_lines));
+	printf("Queries reachable: %d\n", n_reach);
 	
 	free(results);
 	pthread_mutex_destroy(&mutex);
