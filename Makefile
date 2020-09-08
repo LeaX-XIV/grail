@@ -14,11 +14,12 @@ BDIR = bin
 grail: $(OBJ) $(patsubst %,$(ODIR)/%,main.o)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-# Target broken
 test: $(OBJ)
 	$(MKDCMD) $(BDIR)
 	$(CC) src/list/list_test.c $^ -o $(BDIR)/list_test $(CFLAGS) $(LIBS)
 	$(CC) src/graph/graph_test.c $^ -o $(BDIR)/graph_test $(CFLAGS) $(LIBS)
+	$(CC) src/interval/interval_test.c $^ -o $(BDIR)/interval_test $(CFLAGS) $(LIBS)
+	$(CC) src/utils/utils_test.c $^ -o $(BDIR)/utils_test $(CFLAGS) $(LIBS)
 
 src/obj/list.o: src/list/list.c src/list/list.h src/list/list_p.h $(ODIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
