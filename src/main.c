@@ -48,7 +48,7 @@ int main(int argc, char * argv[]) {
 		
 	FILE *fp=fopen(argv[3], "r");
 	pthread_spinlock_t spin;
-	pthread_spin_init(&spin,NULL);
+	pthread_spin_init(&spin, 0);
 	
 	if(g == NULL || fp == NULL) {
 		fprintf(stderr, "Error\n");
@@ -119,7 +119,7 @@ int main(int argc, char * argv[]) {
 	printf("Time to create the index: %d us\n", timeuse1);
 	printf("Size of the index: %ld bytes\n", graph_size(g));
 	printf("Time to execute %d queries: %d us, with an average of %.2f us per query\n", n_lines, timeuse2, ((float)timeuse2 / n_lines));
-	printf("Queries reachable: %d\n", n_reach);
+	printf("Number of positive queries: %d\n", n_reach);
 	
 	free(results);
 	pthread_spin_destroy(&spin);
