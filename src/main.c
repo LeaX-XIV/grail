@@ -47,8 +47,8 @@ int main(int argc, char * argv[]) {
 	printf("Index created\n");
 		
 	FILE *fp=fopen(argv[3], "r");
-	pthread_mutex_t mutex;
-	pthread_mutex_init(&mutex,NULL);
+	pthread_spinlock_t spin;
+	pthread_spin_init(&spin,NULL);
 	
 	if(g == NULL || fp == NULL) {
 		fprintf(stderr, "Error\n");
@@ -69,7 +69,7 @@ int main(int argc, char * argv[]) {
 
 	f.g = g;
 	f.fp = fp;
-	f.mutex = &mutex;
+	f.spin = &spin;
 	f.results = results;
 	f.i = &index;
 
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]) {
 			}
 
 			free(results);
-			pthread_mutex_destroy(&mutex);
+			pthread_spin_destroy(&spin);
 			graph_dispose(g);
 			fclose(fp);
 			free(th);
@@ -122,7 +122,7 @@ int main(int argc, char * argv[]) {
 	printf("Queries reachable: %d\n", n_reach);
 	
 	free(results);
-	pthread_mutex_destroy(&mutex);
+	pthread_spin_destroy(&spin);
 	graph_dispose(g);
 	fclose(fp);
 	free(th);

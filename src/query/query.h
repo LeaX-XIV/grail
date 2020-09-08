@@ -10,7 +10,7 @@
 struct alg2{
     graph_t *g;
     FILE *fp;
-    pthread_mutex_t* mutex;
+    pthread_spinlock_t* spin;
     char* results;
     int* i;
 };

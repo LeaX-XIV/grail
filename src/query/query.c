@@ -11,15 +11,15 @@ void* filereadthread(void *arg){
     struct alg2 *filedata;
     filedata=(struct alg2 *)arg;
     g=filedata->g;
-    pthread_mutex_t* mutex = filedata->mutex;
+    pthread_spinlock_t* spin = filedata->spin;
     char* results = filedata->results;
     int* i = filedata->i;
     
     do{
-        pthread_mutex_lock(mutex);
+        pthread_spin_lock(spin);
         int index = (*i)++;
         retVal = fscanf (filedata->fp, "%d%d", &u,&v);
-        pthread_mutex_unlock(mutex);
+        pthread_spin_unlock(spin);
         
         if (retVal!=EOF) {
     
