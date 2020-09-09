@@ -16,13 +16,14 @@ graph_t *graph_load(char *filename, int d) {
 	unsigned int i;
 	char child_string[10];
 	unsigned int parent, child;
+	char error = (char)0;
+	int n;
 
 	g = malloc(sizeof(*g));
 	if(g == NULL)
 		return NULL;
 
 	g->d = d;
-	// g->roots = list_create();
 
 	fp = fopen(filename, "r");
 	if(fp == NULL) {
@@ -30,7 +31,7 @@ graph_t *graph_load(char *filename, int d) {
 		return NULL;
 	}
 
-	fscanf(fp, "%u", &nodesnumber);
+	n = fscanf(fp, "%u", &nodesnumber);
 	g->nv = nodesnumber;
 	g->g = malloc(g->nv * sizeof(*g->g));
 	if(g->g == NULL) {
@@ -49,19 +50,30 @@ graph_t *graph_load(char *filename, int d) {
 		list_t *child_list = list_create();
 		list_init(child_list, 1);
 
-		fscanf(fp, "%u:", &parent);
+		n = fscanf(fp, "%u:", &parent);
 		g->g[parent].id = parent;
 
-		fscanf(fp, "%s", child_string);
+		n = fscanf(fp, "%s", child_string);
 
 		while(child_string[0] != '#') {
 			child = atoi(child_string);
-			if(list_append(child_list, child) == 0) // Save in list
-				printf("Error\n"); 
-			fscanf(fp, "%s", child_string);
+			if(list_append(child_list, child) == 0) {// Save in list
+				error = (char) 1;
+				break;
+			}
+			n = fscanf(fp, "%s", child_string);
 		}
 
+		if(error)
+			break;
+
 		g->g[i].rowAdj = child_list;
+	}
+
+	if(error) {
+		fclose(fp);
+		// g not destroyed, leak memory
+		return NULL;
 	}
 
 	g->roots = graph_get_roots(g);
@@ -124,7 +136,7 @@ list_t* graph_get_roots(graph_t* graph) {
 
 size_t graph_size(graph_t* g) {
 	if(g == NULL) 
-	return 0;
+		return 0;
 
 	size_t size = sizeof(*g) +	// graph_t struct
 		g->nv * (

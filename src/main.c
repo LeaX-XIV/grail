@@ -44,6 +44,12 @@ int main(int argc, char * argv[]) {
 	gettimeofday( &s2, NULL );
 	int timeuse1 = 1000000 * ( s2.tv_sec - s1.tv_sec ) + s2.tv_usec - s1.tv_usec;
 
+	if(g == NULL) {
+		printf("Allocation error: Not enough memory. Aborting.\n");
+		free(th);
+		return EXIT_FAILURE;
+	}
+
 	printf("Index created\n");
 		
 	FILE *fp=fopen(argv[3], "r");
@@ -104,7 +110,7 @@ int main(int argc, char * argv[]) {
 	fseek(fp, 0, SEEK_SET);
 
 	for(i = 0; i < n_lines; ++i) {
-		fscanf (fp, "%d%d", &u,&v);
+		retcode = fscanf (fp, "%d%d", &u,&v);
 		if(f.results[i]==1) {
 			fprintf (stdout, "query: %d is reachable from %d\n", v, u);
 			n_reach++;
