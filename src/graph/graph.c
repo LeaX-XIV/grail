@@ -269,7 +269,7 @@ int graph_reachable(graph_t* g, int u, int v) {
 
 		list_get(g->g[u].rowAdj, i, &c);
 
-		for(int j = 0; j < g->d; ++j) {
+		for(j = 0; j < g->d; ++j) {
 			b &= interval_check(g->g[c].labels[j], g->g[v].labels[j]);
 		}
 
