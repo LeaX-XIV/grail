@@ -14,7 +14,7 @@ The program is implemented in the UNIX-like POSIX system.
 
 We decided to parallelize the index creation and the query resolution as two different, unrelated parts.
 
-For index creation, we generate `d` threads, each of which generates one layer of labels with a time complexity O(n + m). No synchronization primitives are needed during this phase, as every thread works on different portions of memory.
+For index creation, we generate `d` threads, each of which generates one layer of labels with a time complexity O(n + m). We choose the basic Randomized approach described in the GRAIL paper, and no support for exception lists, as this is the same setup used in the experiments in the paper. No synchronization primitives are needed during this phase, as every thread works on different portions of memory.
 
 For query resolution, we generate a number of threads equals to the number of processors/cores of the machine, each of which repeatedly reads a line from the query file in mutual exclusion (with a spinlock, to reduce the number of context switches), runs the algorithm with time complexity between O(d) and O(n + m) (as proved in the GRAIL paper) and saves the result in an array, for later printing. Accessing the array of results is not mandated by any synchronization primitive, as every thread writes in a different portion of the array, and the reading is done by one thread, after all results have been generated.
 
@@ -26,9 +26,9 @@ In particular:
 - For synthetic graphs, we cannot compare our results with the one in the paper because our graphs have an average degree much larger than the ones used in the GRAIL paper.
 - For small, sparse graphs, some of our results are between 1.5 and 10 times faster, while other are between 2 and 5 times slower. It is worth noting than the slower times are obteined from a different machine than the faster times.
 - For small, dense graphs our results are around 2 times slower (we could only run arXiv with d > 5). Again, this slow results are obtained on the same slow machine mentioned above.
-- For large, real graphs, our results are between 0% and 100% faster (we could not test uniprot-100m, because it stopped with a memory allocation error).
+- For large, real graphs, our code can run up to 2 times faster (we could not test uniprot-100m, because it stopped with a memory allocation error).
 
-We can say that, for all graphs, the time for query resolution greatly drops with the increase of the number of labels (between 5 and 10 times faster), with a time for creating the index that rises between 50% and 400%, with a greater increase in smaller graphs.
+We can say that, for all graphs, the time for query resolution greatly drops with the increase of the number of labels (up to 50 times faster in some graphs), with a time for creating the index that rises between 50% and 300%, with a greater increase in smaller graphs.
 
 ## Conclusion
 
